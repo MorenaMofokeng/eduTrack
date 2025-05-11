@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            background-color: #343a40;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            padding-top: 15px;
+            overflow-y: auto;
+            margin-top: 60px;
+        }
+        .sidebar .nav-link {
+            color: #ffffff;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+
+        .navbar-custom {
+            background-color: #007bff;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-custom .container-fluid span {
+            color: #ffffff;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        .dashboard-section {
+            display: none;
+        }
+        #dashboard { display: block; }
+
+        .card img {
+            height: 150px;
+            object-fit: cover;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+    </style>
+</head>
+
+{% load static %}
+<body>
+
+    <nav class="navbar navbar-light navbar-custom">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center">
+            <img src="{% static user.profile_pic %}" class="rounded-circle" width="40" height="40" alt="Profile">
+            <div class="profile ms-2">
+                <span class="fw-bold">{{ user.student_number }}</span>
+                <span class="fw-bold">{{ user.Role }}</span>
+            </div>
+        </div>
+        <button class="btn btn-outline-light">Logout</button>
+    </div>
+</nav>
+
+
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" onclick="showSection('dashboard')">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('performance')">Performance</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('exam-eligibility')">Exam Qualification</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('study-tips')">Study Tips</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('attendance')">Take Attendance</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="downloadAcademicRecord()">Download Records</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <section id="dashboard" class="dashboard-section">
+            <div class="row">
+                {% for subject in subjects_registered %}
+                <div class="col-md-4 mb-4">
+                    <a href="/subject-details/{{ subject.code }}" class="text-decoration-none">
+                        <div class="card bg-primary text-white">
+                            <img src="{% static 'dashboard/styles/Edu-logo.png' %}" class="card-img-top" alt="{{ subject.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ subject.name }}</h5>
+                                <p class="card-text">Subject Code: {{ subject.code }}</p>
+                                <p class="card-text">Semester: {{ subject.semester }}</p>
+                                <p class="card-text">Course: {{ subject.course }}</p>
+                                <canvas id="{{ subject.code }}Chart"></canvas>
+                                <p>Performance: {{ subject.performance }}%</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Performance Tracking -->
+        <section id="performance" class="dashboard-section">
+            <h4> Performance</h4>
+  
+            <p id="performanceSummary"></p>
+            <canvas id="performanceChart"></canvas>
+        </section>
+
+        <!-- Attendance -->
+        <section id="attendance" class="dashboard-section">
+            <h4>Take Attendance</h4>
+            {% if current_class %}
+                <p>Current class in session: <strong>{{ current_class }}</strong></p>
+                <button class="btn btn-success btn-lg" onclick="capturePhoto()">Take Attendance</button>
+                <canvas id="cameraFeed" width="300" height="200"></canvas>
+            {% else %}
+                <p class="text-danger">No class is currently running. Attendance is disabled.</p>
+            {% endif %}
+        </section>
+
+        <!-- Study Tips -->
+        <section id="study-tips" class="dashboard-section">
+            <h4>Study Tips</h4>
+            <ul class="list-group">
+                {% for tip in study_tips %}
+                    <li class="list-group-item">{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll(".dashboard-section").forEach(section => {
+                section.style.display = "none";
+            });
+            document.getElementById(sectionId).style.display = "block";
+            document.querySelectorAll(".sidebar .nav-link").forEach(link => {
+                link.classList.remove("active");
+            });
+            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add("active");
+        }
+
+        function capturePhoto() {
+            alert("Capturing photo for attendance...");
+        }
+    </script>
+
+</body>
+</html>
