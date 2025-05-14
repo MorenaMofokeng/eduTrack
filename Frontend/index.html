@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #3d5166;
+            margin-bottom: 20px;
+        }
+
+        .user-id {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 15px;
+            color: #ecf0f1;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        .card-content {
+            color: #7f8c8d;
+        }
+
+        /* Subjects Page */
+        .subjects-container, .subject-details-container, .attendance-container {
+            display: none;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .subject-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .subject-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .subject-progress {
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 4px;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+        }
+
+        /* Subject Details Page */
+        .subject-details {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            width: 200px;
+            color: #2c3e50;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #7f8c8d;
+        }
+
+        /* Attendance Page */
+        .attendance-chart {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            width: 80%;
+            height: 80%;
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #95a5a6;
+            font-size: 18px;
+        }
+
+        .attendance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 10px 0;
+        }
+
+        .summary-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Attendance Filter */
+        .attendance-filter {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        /* Attendance Records Table */
+        .attendance-records {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .records-table th, .records-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .records-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .records-table tr:hover {
+            background-color: #f5f7fa;
+        }
+
+        .status-present {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-absent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Interactive Elements */
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+
+        .btn-outline:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="user-info">
+            <div class="user-id">220970884</div>
+            <div class="user-name">Student</div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="courses">
+                    <i class="fas fa-book"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="performance">
+                    <i class="fas fa-chart-line"></i> Performance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="attendance">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="records">
+                    <i class="fas fa-download"></i> Download Records
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area - Dashboard -->
+    <div class="main-content" id="dashboard-content">
+        <div class="header">Dashboard</div>
+        
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-header">Current Courses</div>
+                <div class="card-content">
+                    <p>Mathematics, Science, English, History</p>
+                    <button class="btn btn-secondary" id="view-courses">View Details</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Attendance Summary</div>
+                <div class="card-content">
+                    <p>Your current attendance rate is 92%</p>
+                    <button class="btn" id="view-attendance">See Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects Content Area -->
+    <div class="main-content subjects-container" id="subjects-content">
+        <button class="btn btn-outline back-btn" id="back-to-dashboard">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+        
+        <div class="header">My Subjects</div>
+        
+        <div class="subjects-grid">
+            <div class="subject-card" data-subject="math">
+                <div class="subject-name">Mathematics</div>
+                <div class="subject-meta">
+                    <span>MATH101</span> • 
+                    <span>Semester 1</span> • 
+                    <span>Dr. Smith</span>
+                </div>
+                <div class="subject-progress">
+                    <div class="progress-bar" style="width: 85%"></div>
+                </div>
+                <p>Current Grade: 85%</p>
+                <button class="btn view-progress">View Progress</button>
+            </div>
+            
+            <div class="subject-card" data-subject="science">
+                <div class="subject-name">Science</div>
+                <div class="subject-meta">
+                    <span>SCI201</span> • 
+                    <span>Semester 1</span> • 
+                    <span>Prof. Johnson</span>
+                </div>
+                <div class="subject-progress">
+                    <div class="progress-bar" style="width: 78%"></div>
+                </div>
+                <p>Current Grade: 78%</p>
+                <button class="btn view-progress">View Progress</button>
+            </div>
+            
+            <div class="subject-card" data-subject="english">
+                <div class="subject-name">English</div>
+                <div class="subject-meta">
+                    <span>ENG101</span> • 
+                    <span>Semester 1</span> • 
+                    <span>Dr. Williams</span>
+                </div>
+                <div class="subject-progress">
+                    <div class="progress-bar" style="width: 92%"></div>
+                </div>
+                <p>Current Grade: 92%</p>
+                <button class="btn view-progress">View Progress</button>
+            </div>
+            
+            <div class="subject-card" data-subject="history">
+                <div class="subject-name">History</div>
+                <div class="subject-meta">
+                    <span>HIS102</span> • 
+                    <span>Semester 1</span> • 
+                    <span>Prof. Brown</span>
+                </div>
+                <div class="subject-progress">
+                    <div class="progress-bar" style="width: 88%"></div>
+                </div>
+                <p>Current Grade: 88%</p>
+                <button class="btn view-progress">View Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Details Content Area -->
+    <div class="main-content subject-details-container" id="subject-details-content">
+        <button class="btn btn-outline back-btn" id="back-to-subjects">
+            <i class="fas fa-arrow-left"></i> Back to Subjects
+        </button>
+        
+        <div class="header" id="subject-details-header">Subject Details</div>
+        
+        <div class="subject-details">
+            <div class="detail-row">
+                <div class="detail-label">Subject Name:</div>
+                <div class="detail-value" id="detail-name">Mathematics</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Course Code:</div>
+                <div class="detail-value" id="detail-code">MATH101</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Instructor:</div>
+                <div class="detail-value" id="detail-instructor">Dr. Smith</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Semester:</div>
+                <div class="detail-value" id="detail-semester">Semester 1</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Current Grade:</div>
+                <div class="detail-value" id="detail-grade">85%</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Progress:</div>
+                <div class="detail-value">
+                    <div class="subject-progress">
+                        <div class="progress-bar" id="detail-progress" style="width: 85%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Assignments:</div>
+                <div class="detail-value">
+                    <ul>
+                        <li>Assignment 1: 90/100</li>
+                        <li>Assignment 2: 85/100</li>
+                        <li>Assignment 3: 80/100</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Exams:</div>
+                <div class="detail-value">
+                    <ul>
+                        <li>Midterm Exam: 88/100</li>
+                        <li>Final Exam: Pending</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Content Area -->
+    <div class="main-content attendance-container" id="attendance-content">
+        <button class="btn btn-outline back-btn" id="back-to-dashboard-from-attendance">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+        
+        <div class="header">Attendance Records</div>
+        
+        <!-- Attendance Filter -->
+        <div class="attendance-filter">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <input type="date" class="filter-input" id="from-date">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <input type="date" class="filter-input" id="to-date">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Subject</label>
+                    <select class="filter-input" id="subject-filter">
+                        <option value="all">All Subjects</option>
+                        <option value="math">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                        <option value="history">History</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="btn" id="apply-filter">Apply Filter</button>
+                <button class="btn btn-secondary" id="reset-filter">Reset</button>
+            </div>
+        </div>
+        
+        <div class="attendance-summary">
+            <div class="summary-card">
+                <div class="summary-label">Total Classes</div>
+                <div class="summary-value" id="total-classes">45</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Present</div>
+                <div class="summary-value" id="present-count">41</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Absent</div>
+                <div class="summary-value" id="absent-count">4</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Attendance Rate</div>
+                <div class="summary-value" id="attendance-rate">92%</div>
+            </div>
+        </div>
+        
+        <div class="attendance-chart">
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    Attendance Trend Graph (Monthly)
+                </div>
+            </div>
+        </div>
+        
+        <div class="attendance-records">
+            <h3>Detailed Records</h3>
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody id="records-body">
+                    <!-- Records will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- JavaScript for interactivity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample attendance data
+            const attendanceData = [
+                { date: '2023-10-01', subject: 'math', className: 'Algebra', status: 'present', remarks: '' },
+                { date: '2023-10-02', subject: 'science', className: 'Physics', status: 'present', remarks: '' },
+                { date: '2023-10-03', subject: 'english', className: 'Literature', status: 'present', remarks: '' },
+                { date: '2023-10-04', subject: 'history', className: 'World History', status: 'absent', remarks: 'Sick' },
+                { date: '2023-10-05', subject: 'math', className: 'Geometry', status: 'present', remarks: '' },
+                { date: '2023-10-08', subject: 'science', className: 'Chemistry', status: 'present', remarks: '' },
+                { date: '2023-10-09', subject: 'english', className: 'Grammar', status: 'present', remarks: '' },
+                { date: '2023-10-10', subject: 'history', className: 'European History', status: 'present', remarks: '' },
+                { date: '2023-10-11', subject: 'math', className: 'Calculus', status: 'absent', remarks: 'Family event' },
+                { date: '2023-10-12', subject: 'science', className: 'Biology', status: 'present', remarks: '' },
+                { date: '2023-10-15', subject: 'english', className: 'Writing', status: 'present', remarks: '' },
+                { date: '2023-10-16', subject: 'history', className: 'American History', status: 'present', remarks: '' },
+                { date: '2023-10-17', subject: 'math', className: 'Statistics', status: 'present', remarks: '' },
+                { date: '2023-10-18', subject: 'science', className: 'Physics', status: 'absent', remarks: 'Doctor appointment' },
+                { date: '2023-10-19', subject: 'english', className: 'Literature', status: 'present', remarks: '' },
+                { date: '2023-10-22', subject: 'history', className: 'World History', status: 'present', remarks: '' },
+                { date: '2023-10-23', subject: 'math', className: 'Algebra', status: 'present', remarks: '' },
+                { date: '2023-10-24', subject: 'science', className: 'Chemistry', status: 'present', remarks: '' },
+                { date: '2023-10-25', subject: 'english', className: 'Grammar', status: 'absent', remarks: 'Personal' },
+                { date: '2023-10-26', subject: 'history', className: 'European History', status: 'present', remarks: '' }
+            ];
+
+            // Navigation menu interaction
+            const navLinks = document.querySelectorAll('.nav-link');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const subjectsContent = document.getElementById('subjects-content');
+            const subjectDetailsContent = document.getElementById('subject-details-content');
+            const attendanceContent = document.getElementById('attendance-content');
+            
+            // Initialize the page with dashboard
+            showDashboard();
+            renderAttendanceRecords(attendanceData);
+            updateAttendanceSummary(attendanceData);
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Get the section to show
+                    const section = this.getAttribute('data-section');
+                    
+                    // Update content based on selection
+                    if (section === 'dashboard') {
+                        showDashboard();
+                    } else if (section === 'courses') {
+                        showSubjectsPage();
+                    } else if (section === 'attendance') {
+                        showAttendancePage();
+                    } else {
+                        showDashboard();
+                        // In a real app, we would load different content here
+                        console.log(`Loading section: ${section}`);
+                    }
+                });
+            });
+            
+            // Button to view courses
+            document.getElementById('view-courses').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSubjectsPage();
+            });
+            
+            // Button to view attendance
+            document.getElementById('view-attendance').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAttendancePage();
+            });
+            
+            // Back button functionality
+            document.getElementById('back-to-dashboard').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboard();
+            });
+            
+            document.getElementById('back-to-subjects').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSubjectsPage();
+            });
+            
+            document.getElementById('back-to-dashboard-from-attendance').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboard();
+            });
+            
+            // View progress buttons
+            document.querySelectorAll('.view-progress').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const subjectCard = this.closest('.subject-card');
+                    const subject = subjectCard.getAttribute('data-subject');
+                    showSubjectDetails(subject);
+                });
+            });
+            
+            // Other button interactions
+            document.getElementById('view-notifications').addEventListener('click', function() {
+                alert('Notifications would be displayed here');
+            });
+            
+            // Attendance filter functionality
+            document.getElementById('apply-filter').addEventListener('click', function() {
+                applyAttendanceFilter();
+            });
+            
+            document.getElementById('reset-filter').addEventListener('click', function() {
+                resetAttendanceFilter();
+            });
+            
+            function showDashboard() {
+                dashboardContent.style.display = 'block';
+                subjectsContent.style.display = 'none';
+                subjectDetailsContent.style.display = 'none';
+                attendanceContent.style.display = 'none';
+                // Set dashboard nav link as active
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('.nav-link[data-section="dashboard"]').classList.add('active');
+            }
+            
+            function showSubjectsPage() {
+                dashboardContent.style.display = 'none';
+                subjectsContent.style.display = 'block';
+                subjectDetailsContent.style.display = 'none';
+                attendanceContent.style.display = 'none';
+                // Set courses nav link as active
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('.nav-link[data-section="courses"]').classList.add('active');
+            }
+            
+            function showSubjectDetails(subject) {
+                dashboardContent.style.display = 'none';
+                subjectsContent.style.display = 'none';
+                subjectDetailsContent.style.display = 'block';
+                attendanceContent.style.display = 'none';
+                
+                // Set courses nav link as active (since we're still in courses section)
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('.nav-link[data-section="courses"]').classList.add('active');
+                
+                // In a real app, we would fetch subject details from a database
+                // Here we'll just simulate with some data
+                let subjectData = {};
+                
+                switch(subject) {
+                    case 'math':
+                        subjectData = {
+                            name: 'Mathematics',
+                            code: 'MATH101',
+                            instructor: 'Dr. Smith',
+                            semester: 'Semester 1',
+                            grade: '85%',
+                            progress: '85'
+                        };
+                        break;
+                    case 'science':
+                        subjectData = {
+                            name: 'Science',
+                            code: 'SCI201',
+                            instructor: 'Prof. Johnson',
+                            semester: 'Semester 1',
+                            grade: '78%',
+                            progress: '78'
+                        };
+                        break;
+                    case 'english':
+                        subjectData = {
+                            name: 'English',
+                            code: 'ENG101',
+                            instructor: 'Dr. Williams',
+                            semester: 'Semester 1',
+                            grade: '92%',
+                            progress: '92'
+                        };
+                        break;
+                    case 'history':
+                        subjectData = {
+                            name: 'History',
+                            code: 'HIS102',
+                            instructor: 'Prof. Brown',
+                            semester: 'Semester 1',
+                            grade: '88%',
+                            progress: '88'
+                        };
+                        break;
+                }
+                
+                // Update the subject details page
+                document.getElementById('subject-details-header').textContent = subjectData.name + ' Details';
+                document.getElementById('detail-name').textContent = subjectData.name;
+                document.getElementById('detail-code').textContent = subjectData.code;
+                document.getElementById('detail-instructor').textContent = subjectData.instructor;
+                document.getElementById('detail-semester').textContent = subjectData.semester;
+                document.getElementById('detail-grade').textContent = subjectData.grade;
+                document.getElementById('detail-progress').style.width = subjectData.progress + '%';
+            }
+            
+            function showAttendancePage() {
+                dashboardContent.style.display = 'none';
+                subjectsContent.style.display = 'none';
+                subjectDetailsContent.style.display = 'none';
+                attendanceContent.style.display = 'block';
+                // Set attendance nav link as active
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('.nav-link[data-section="attendance"]').classList.add('active');
+            }
+            
+            function renderAttendanceRecords(records) {
+                const recordsBody = document.getElementById('records-body');
+                recordsBody.innerHTML = '';
+                
+                records.forEach(record => {
+                    const row = document.createElement('tr');
+                    
+                    const subjectNames = {
+                        math: 'Mathematics',
+                        science: 'Science',
+                        english: 'English',
+                        history: 'History'
+                    };
+                    
+                    row.innerHTML = `
+                        <td>${formatDate(record.date)}</td>
+                        <td>${subjectNames[record.subject]}</td>
+                        <td>${record.className}</td>
+                        <td class="status-${record.status}">${record.status.charAt(0).toUpperCase() + record.status.slice(1)}</td>
+                        <td>${record.remarks}</td>
+                    `;
+                    
+                    recordsBody.appendChild(row);
+                });
+            }
+            
+            function updateAttendanceSummary(records) {
+                const total = records.length;
+                const present = records.filter(r => r.status === 'present').length;
+                const absent = total - present;
+                const rate = Math.round((present / total) * 100);
+                
+                document.getElementById('total-classes').textContent = total;
+                document.getElementById('present-count').textContent = present;
+                document.getElementById('absent-count').textContent = absent;
+                document.getElementById('attendance-rate').textContent = rate + '%';
+            }
+            
+            function applyAttendanceFilter() {
+                const fromDate = document.getElementById('from-date').value;
+                const toDate = document.getElementById('to-date').value;
+                const subject = document.getElementById('subject-filter').value;
+                
+                let filteredRecords = [...attendanceData];
+                
+                // Filter by date range
+                if (fromDate) {
+                    filteredRecords = filteredRecords.filter(record => record.date >= fromDate);
+                }
+                
+                if (toDate) {
+                    filteredRecords = filteredRecords.filter(record => record.date <= toDate);
+                }
+                
+                // Filter by subject
+                if (subject !== 'all') {
+                    filteredRecords = filteredRecords.filter(record => record.subject === subject);
+                }
+                
+                renderAttendanceRecords(filteredRecords);
+                updateAttendanceSummary(filteredRecords);
+            }
+            
+            function resetAttendanceFilter() {
+                document.getElementById('from-date').value = '';
+                document.getElementById('to-date').value = '';
+                document.getElementById('subject-filter').value = 'all';
+                
+                renderAttendanceRecords(attendanceData);
+                updateAttendanceSummary(attendanceData);
+            }
+            
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('en-US', options);
+            }
+        });
+    </script>
+</body>
+</html>
